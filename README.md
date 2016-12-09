@@ -3,6 +3,24 @@
 kitchen list
 kitchen converge
 ```
+
+# Bootstrap Test
+To test bootstrapping of Chef Server, Chef Manage, and Chef Automate without Test Kitchen:
+
+```shell
+cd bootstrap_test
+vagrant up --provision # --provision flag is necessary due to hacky fix of private NIC being DOWN
+``
+
+## SSH into bootstrap_test instances
+Once provisioned, you can ssh into the instances using `vagrant ssh <name>`.
+
+On Windows, you will probably want to use a better client like Putty or Poderosa. You can use the hostnames and ports below:
+```
+Chef Server: chef.vagrant.local:22
+Chef Automate Server: automate.vagrant.local:22
+```
+
 ### Sets up:
 
 1. chef-server

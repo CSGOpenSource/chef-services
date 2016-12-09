@@ -1,0 +1,51 @@
+raise 'Run `vagrant plugin install vagrant-hostmanager` to use this Vagrantfile!' unless Vagrant.has_plugin?('vagrant-hostmanager')
+
+Vagrant.configure("2") do |config|
+  config.vm.provision "shell", inline: <<-EOF
+#!/bin/bash
+set -e
+if ip addr show enp0s8 | head -n1 | grep -i "state down"; then
+  ifup enp0s8
+fi
+
+# Update this list with any additional packages you may want available on the VMs
+yum install -y emacs-nox vim tmux bind-utils git subversion
+EOF
+  
+  common_instances = [
+    :automate,
+  ]
+
+  config.vm.provider "virtualbox" do |v|
+    v.gui = false # set to true to debug boot process
+  end
+  
+  # Note: port forwarding is not used because:
+  #  1. Both VMs use port 443
+  #  2. Both services are "intelligent" and decide to redirect you to port 443
+  #  3. The vagrant-hostmanager plugin should allow you to access the services
+  #     on the private network by name.
+  config.hostmanager.enabled = true
+  config.hostmanager.manage_host = true
+  config.hostmanager.manage_guest = true
+  config.hostmanager.include_offline = true
+
+  common_instances.each_with_index do |box, ip|
+    config.vm.define box do |b|
+      b.vm.box = 'bento/centos-7.2'
+      b.vm.network :private_network, ip: "192.168.55.10#{ip + 1}"
+      b.vm.hostname = "#{box}.vagrant.local"
+    end
+  end
+
+  config.vm.define "chef-server" do |server|
+    server.vm.box = 'bento/centos-7.2'
+    server.vm.network :private_network, ip: "192.168.55.100"
+    server.vm.hostname = 'chef.vagrant.local'
+    server.vm.provision "shell" do |s|
+      s.path = '../files/default/installer.sh'
+      s.args = '-c chef.vagrant.local -a automate.vagrant.local -u vagrant -p vagrant'
+      s.binary = true
+    end
+  end
+end
