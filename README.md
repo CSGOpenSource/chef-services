@@ -67,4 +67,15 @@ Chef Automate Server: automate.vagrant.local:22
 
 or
 
-`curl -O https://raw.githubusercontent.com/stephenlauck/chef-services/master/files/default/installer.sh && sudo bash ./installer.sh -c 33.33.33.10 -a 33.33.33.11 -b 33.33.33.12 -u vagrant -p vagrant`
+`curl -O https://raw.githubusercontent.com/CSGOpenSource/chef-services/master/files/default/installer.sh && sudo bash ./installer.sh -c $CHEF_SERVER_FQDN-a $AUTOMATE_FQDN -b $BUILD_FQDN -u vagrant -p vagrant`
+
+
+
+
+
+
+
+
+### Bootstrap Instructions
+
+`knife bootstrap $NODE_FQDN --node-name $NODE_FQDN --ssh-user $CHEF_USER --sudo --run-list "role[csg_base]" --yes --node-ssl-verify-mode none`

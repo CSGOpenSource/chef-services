@@ -38,6 +38,19 @@ delivery['chef_private_key'] = "/etc/delivery/delivery.pem"
 delivery['chef_server']      = "https://#{node['chef_server']['fqdn']}/organizations/delivery"
 delivery['default_search']   = "tags:delivery-build-node"
 insights['enable']           = true
+delivery['ldap_hosts'] = #{node['chef-server']['ldap_hosts']}
+delivery['ldap_port'] = "#{node['chef-server']['ldap_port']}"
+delivery['ldap_timeout'] = "#{node['chef-server']['ldap_timeout']}"
+delivery['ldap_base_dn'] = "#{node['chef-server']['ldap_base_dn']}"
+delivery['ldap_bind_dn'] = "#{node['chef-server']['ldap_bind_dn']}"
+delivery['ldap_bind_dn_password'] = "#{node['chef-server']['ldap_bind_dn_password']}"
+delivery['ldap_encryption'] = "#{node['chef-server']['ldap_encryption']}"
+delivery['ldap_attr_login'] = "#{node['chef-server']['ldap_attr_login']}"
+delivery['ldap_attr_mail'] = "#{node['chef-server']['ldap_attr_mail']}"
+delivery['ldap_attr_full_name'] = "#{node['chef-server']['ldap_attr_full_name']}"
+
+
+
   EOS
   package_source "#{node['chef_server']['install_dir']}/#{file_info['name']}"
   action :install
