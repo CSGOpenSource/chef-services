@@ -9,6 +9,7 @@ To test bootstrapping of Chef Server, Chef Manage, and Chef Automate without Tes
 
 ```shell
 cd bootstrap_test
+vagrant plugin install vagrant-hostmanager # This plugin updates the hosts file of the guests and host
 vagrant up --provision # --provision flag is necessary due to hacky fix of private NIC being DOWN
 ``
 
