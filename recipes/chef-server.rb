@@ -13,13 +13,6 @@ oc_id['applications'] = {
   "supermarket"=>{"redirect_uri"=>"https://supermarket.services.com/auth/chef_oauth2/callback"}
 }
 
-ldap['system_adjective'] = "#{node['chef-server']['system_adjective']}"
-ldap['base_dn'] = "#{node['chef-server']['base_dn']}"
-ldap['bind_dn'] = "#{node['chef-server']['bind_dn']}"
-ldap['bind_password'] = "#{node['chef-server']['bind_password']}"
-ldap['group_dn'] = "#{node['chef-server']['group_dn']}"
-ldap['port'] = "#{node['chef-server']['port']}"
-ldap['login_attribute'] = "#{node['chef-server']['login_attribute']}"
 
 EOS
   action :upgrade
