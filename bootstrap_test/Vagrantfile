@@ -19,6 +19,7 @@ EOF
   
   common_instances = [
     :automate,
+    :worker,
   ]
 
   config.vm.provider "virtualbox" do |v|
@@ -49,7 +50,7 @@ EOF
     server.vm.hostname = 'chef.vagrant.local'
     server.vm.provision "shell" do |s|
       s.path = '../files/default/installer.sh'
-      s.args = '-c chef.vagrant.local -a automate.vagrant.local -u vagrant -p vagrant'
+      s.args = '-c chef.vagrant.local -a automate.vagrant.local -b worker.vagrant.local -u vagrant -p vagrant'
       s.binary = true
     end
   end
