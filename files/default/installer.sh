@@ -17,7 +17,8 @@ You must specify the following options:\n
 -b|--build-node-fqdn          The FQDN of the build node.\n
 -u|--user                     The ssh username we'll use to connect to other systems.\n
 -p|--password                 The ssh password we'll use to connect to other systems.\n
--i|--install-dir              The directory to use for the installer.
+-i|--install-dir              The directory to use for the installer.\n
+-k|--key                      SSH Key.\n
 
 If only -c is specified the local system will be configured with a Chef Server install. \n
 "
@@ -59,6 +60,10 @@ case $key in
     echo -e $usage
     exit 0
     ;;
+    -k|--key)
+    KEY_FILE_LOCATION="$2"
+    shift
+    ;;
     *)
     echo "Unknown option $1"
     echo -e $usage
@@ -70,7 +75,7 @@ done
 
 # Do you want to connect by ssh key or user/pass?
 # Please provide a ssh username:
-# Please provide a ssh password:
+
 # --or--
 # Please provide a ssh key:
 #
@@ -100,6 +105,11 @@ chef-client -z -j attributes.json --config-option file_cache_path=$INSTALL_DIR -
 # -> automate,chef-builder1,chef-builder2,chef-builder3,supermarket,compliance.domain.com
 # --> bootstrap with correct runlist
 
+PASS="-P $CHEF_PW"
+if [ ! -z $KEY_FILE_LOCATION ]; then
+  PASS="-i $KEY_FILE_LOCATION"
+fi
+
 if [ ! -z $CHEF_AUTOMATE_FQDN ]; then
   knife bootstrap $CHEF_AUTOMATE_FQDN -N $CHEF_AUTOMATE_FQDN -x $CHEF_USER -P $CHEF_PW --sudo -r "recipe[chef-services::delivery]" -j "{\"chef_server\":{\"fqdn\":\"$CHEF_SERVER_FQDN\"},\"chef_automate\":{\"fqdn\":\"$CHEF_AUTOMATE_FQDN\"}}" -y --node-ssl-verify-mode none
   if [ ! -z $CHEF_BUILD_FQDN ] ; then
@@ -108,3 +118,4 @@ if [ ! -z $CHEF_AUTOMATE_FQDN ]; then
 fi
 
 chef-client -j attributes.json -r 'recipe[chef-services::chef-server]'
+
