@@ -73,6 +73,8 @@ esac
 shift # past argument or value
 done
 
+echo " -------------------------- Step! 1 -----------------------------------------"
+
 # Do you want to connect by ssh key or user/pass?
 # Please provide a ssh username:
 
@@ -85,6 +87,8 @@ if [ -z $INSTALL_DIR ]; then
   INSTALL_DIR=/tmp
 fi
 
+echo " -------------------------- Step! 2 -----------------------------------------"
+
 mkdir -p $INSTALL_DIR/chef_installer/cookbooks/installer/recipes/
 mkdir -p $INSTALL_DIR/chef_installer/.chef/cache/
 cd $INSTALL_DIR/chef_installer
@@ -95,8 +99,13 @@ fi
 echo "file_cache_path \"$INSTALL_DIR/chef_installer/.chef/cache\"" > solo_installer.rb
 echo -e "{\"install_dir\":\"$INSTALL_DIR\"}" > installer.json
 chef-client -z -j installer.json -c solo_installer.rb -r 'recipe[installer::installer]'
+
+echo " -------------------------- Step! 3 -----------------------------------------"
+
 echo -e "{\"chef_server\": {\"fqdn\":\"$CHEF_SERVER_FQDN\",\"install_dir\":\"$INSTALL_DIR\"}}" > attributes.json
 chef-client -z -j attributes.json --config-option file_cache_path=$INSTALL_DIR -r 'recipe[chef-services::chef-server]'
+
+echo " -------------------------- Step! 4 -----------------------------------------"
 
 # ->upload cookbooks to itself
 # ->generate keys, create data_bags
@@ -111,11 +120,14 @@ if [ ! -z $KEY_FILE_LOCATION ]; then
 fi
 
 if [ ! -z $CHEF_AUTOMATE_FQDN ]; then
-  knife bootstrap $CHEF_AUTOMATE_FQDN -N $CHEF_AUTOMATE_FQDN -x $CHEF_USER -P $CHEF_PW --sudo -r "recipe[chef-services::delivery]" -j "{\"chef_server\":{\"fqdn\":\"$CHEF_SERVER_FQDN\"},\"chef_automate\":{\"fqdn\":\"$CHEF_AUTOMATE_FQDN\"}}" -y --node-ssl-verify-mode none
+  echo " -------------------------- Step! 5 -----------------------------------------"
+  knife bootstrap $CHEF_AUTOMATE_FQDN -N $CHEF_AUTOMATE_FQDN -x $CHEF_USER $PASS --sudo -r "recipe[chef-services::delivery]" -j "{\"chef_server\":{\"fqdn\":\"$CHEF_SERVER_FQDN\"},\"chef_automate\":{\"fqdn\":\"$CHEF_AUTOMATE_FQDN\"}}" -y --node-ssl-verify-mode none
   if [ ! -z $CHEF_BUILD_FQDN ] ; then
-      knife bootstrap $CHEF_BUILD_FQDN -N $CHEF_BUILD_FQDN -x $CHEF_USER -P $CHEF_PW --sudo -r "recipe[chef-services::install_build_nodes]" -j "{\"chef_server\":{\"fqdn\":\"$CHEF_SERVER_FQDN\"},\"chef_automate\":{\"fqdn\":\"$CHEF_AUTOMATE_FQDN\"},\"tags\":\"delivery-build-node\"}" -y --node-ssl-verify-mode none
+      echo " -------------------------- Step! 6 -----------------------------------------"
+      knife bootstrap $CHEF_BUILD_FQDN -N $CHEF_BUILD_FQDN -x $CHEF_USER $PASS --sudo -r "recipe[chef-services::install_build_nodes]" -j "{\"chef_server\":{\"fqdn\":\"$CHEF_SERVER_FQDN\"},\"chef_automate\":{\"fqdn\":\"$CHEF_AUTOMATE_FQDN\"},\"tags\":\"delivery-build-node\"}" -y --node-ssl-verify-mode none
   fi
 fi
 
+echo " -------------------------- Step! 7 -----------------------------------------"
 chef-client -j attributes.json -r 'recipe[chef-services::chef-server]'
 
