@@ -8,12 +8,12 @@ end
 action_class do
   def wait_for_server_startup
     Chef::Log.info('Waiting for the Chef server to be ready')
-    attempts = 90
+    attempts = 250
     STDOUT.sync = true
     (0..attempts).each do |attempt|
       break if erchef_ready?
-      sleep 1
-      print '.'
+      sleep 30
+      print "#{attempt} "
       if attempt == attempts
         raise "Gave up waiting for the Chef server to be ready after #{attempt} attempts"
       end
