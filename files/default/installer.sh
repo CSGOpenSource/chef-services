@@ -6,6 +6,14 @@
 # Hab package?
 #
 
+ERROR_CODE_101=101
+ERROR_CODE_TEXT_101="Value required for option: -c|--chef-server-fqdn"
+ERROR_CODE_101=102
+ERROR_CODE_TEXT_102="Value required for option: -a|--chef-automate-fqdn)"
+ERROR_CODE_101=103
+ERROR_CODE_TEXT_103="Value required for option: -b|--build-node-fqdn"
+
+
 usage="
 This is an installer for Chef. It will install Chef Server, Chef Automate, and a build node for Automate.\n
 It will install the Chef server on the system you run this script from.\n
@@ -34,14 +42,26 @@ key="$1"
 case $key in
     -c|--chef-server-fqdn)
     CHEF_SERVER_FQDN="$2"
+    if [ -z $CHEF_SERVER_FQDN ]; then
+        echo $ERROR_CODE_TEXT_101
+        exit $ERROR_CODE_101
+    fi
     shift # past argument
     ;;
     -a|--chef-automate-fqdn)
     CHEF_AUTOMATE_FQDN="$2"
+    if [ -z $CHEF_AUTOMATE_FQDN ]; then
+        echo $ERROR_CODE_TEXT_102
+        exit $ERROR_CODE_102
+    fi
     shift # past argument
     ;;
     -b|--build-node-fqdn)
     CHEF_BUILD_FQDN="$2"
+    if [ -z $CHEF_BUILD_FQDN ]; then
+        echo $ERROR_CODE_TEXT_103
+        exit $ERROR_CODE_103
+    fi
     shift # past argument
     ;;
     -u|--user)
